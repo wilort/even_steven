@@ -10,5 +10,7 @@ public:
     std::vector<Person> people;
 
     Problem(std::vector<Person> a);
+    void solve();
+    void print_solution();
     void myFunction();
 };

@@ -15,11 +15,14 @@ int main() {
     people.emplace_back("D", "0761042994", -503);
     people.emplace_back("E", "0761042995", -504);
 
-    for (Person p : people) {
-        std::cout << p.name << ", ";
-        std::cout << p.phone_number << ", ";
-        std::cout << p.balance << "\n";
-        p.myFunction();
-    }
+    Problem problem(people);
+    problem.solve();
+    problem.print_solution();
+    /* for (Person p : people) { */
+    /*     std::cout << p.name << ", "; */
+    /*     std::cout << p.phone_number << ", "; */
+    /*     std::cout << p.balance << "\n"; */
+    /*     p.myFunction(); */
+    /* } */
     return 0;
 }
