@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 
+// testing
+
 // constructor
 Person::Person(std::string a, std::string b, double c) {
     name = a;
@@ -10,5 +12,5 @@ Person::Person(std::string a, std::string b, double c) {
 }
 
 void Person::myFunction() {
-    std::cout << "shit" << "\n";
+    std::cout << "shiter" << "\n";
 };
