@@ -8,8 +8,10 @@ private:
 public:
     std::string name;
     std::string phone_number;
-    double balance;
+    double payed;
 
     Person(std::string a, std::string b, double c);
+    /* bool operator < (const Person p); */
     void myFunction();
+
 };

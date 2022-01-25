@@ -8,8 +8,12 @@
 Person::Person(std::string a, std::string b, double c) {
     name = a;
     phone_number = b;
-    balance = c;
+    payed = c;
 }
+
+/* bool Person::operator < (const Person& p){ */
+/*     return (balance < p.balance); */
+/* } */
 
 void Person::myFunction() {
     std::cout << "shiter" << "\n";
