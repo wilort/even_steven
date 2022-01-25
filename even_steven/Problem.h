@@ -11,6 +11,7 @@ public:
     std::vector<std::tuple<Person, Person, double>> transactions;
 
     Problem(std::vector<Person> a);
+    void read_input();
     void solve();
     void print_solution();
     void myFunction();

@@ -1,5 +1,6 @@
 #include "Problem.h"
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <numeric>
 
@@ -10,8 +11,22 @@ Problem::Problem(std::vector<Person> a) {
 
 bool sort_function(const Person p1, const Person p2){ return p1.payed < p2.payed; }
 
+void Problem::read_input() {
+  std::cout << "Reading input ..." << "\n";
+  std::string line;
+  std::ifstream myfile("input");
+  if (myfile.is_open()){
+    while (std::getline(myfile,line)){
+      std::cout << line << '\n';
+    }
+  }
+  else{
+    std::cout << line << "\n";
+  }
+}
+
 void Problem::solve() {
-    std::cout << "Initiating problem solving2 ..." << "\n";
+    std::cout << "Initiating problem solving ..." << "\n";
 
     int number_of_people = people.size();
     double total_payed = 0;
@@ -29,7 +44,6 @@ void Problem::solve() {
       double maximum_give = desired_pay - p1->payed;
       double maximum_recieve = p2->payed - desired_pay;
       double transaction = std::min(maximum_give, maximum_recieve);
-      std::cout << " " << p1->name << " pays " << transaction << " to " << p2->name << "\n";
       transactions.emplace_back(*p1, *p2, transaction);
       p1->payed += transaction;
       p2->payed -= transaction;
