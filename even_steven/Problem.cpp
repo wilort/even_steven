@@ -25,7 +25,7 @@ void Problem::solve() {
     std::sort(people.begin(), people.end(), sort_function);
     auto p1 = people.begin();
     auto p2 = people.end() - 1;
-    while (p1 != p2){
+    while (p1 < p2){
       double maximum_give = desired_pay - p1->payed;
       double maximum_recieve = p2->payed - desired_pay;
       double transaction = std::min(maximum_give, maximum_recieve);
@@ -52,11 +52,10 @@ void Problem::print_solution() {
           double swish = std::get<2>(transaction);
           std::cout << person.name << " recieves " << swish << " from " << reciever.name << "\n";
         }
-        /* std::cout << "" << std::get<0>(transaction).name << "\n"; */
-        /* std::cout << "" << std::get<0>(transaction).name << "\n"; */
       }
     }
 };
+
 void Problem::myFunction() {
     std::cout << "shiter" << "\n";
 };
