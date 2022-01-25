@@ -9,8 +9,6 @@ Problem::Problem(std::vector<Person> a) {
     people = a;
 }
 
-bool sort_function(const Person p1, const Person p2){ return p1.payed < p2.payed; }
-
 void Problem::read_input() {
   std::cout << "Reading input ..." << "\n";
   std::string line;
@@ -28,16 +26,17 @@ void Problem::read_input() {
 void Problem::solve() {
     std::cout << "Initiating problem solving ..." << "\n";
 
+    double total_payed = std::accumulate(people.begin(),
+                                         people.end(),
+                                         0,
+                                         [](double a, Person b) { return a + b.payed; });
+
     int number_of_people = people.size();
-    double total_payed = 0;
-    for (Person p : people) {
-      total_payed += p.payed;
-    }
     double desired_pay = total_payed / number_of_people;
 
     std::cout << "Everyone should pay " << desired_pay << "\n";
 
-    std::sort(people.begin(), people.end(), sort_function);
+    std::sort(people.begin(), people.end(), [](Person a, Person b) { return a.payed < b.payed; });
     auto p1 = people.begin();
     auto p2 = people.end() - 1;
     while (p1 < p2){
