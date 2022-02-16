@@ -10,6 +10,7 @@ public:
     std::vector<Person> people;
     std::vector<std::tuple<Person, Person, double>> transactions;
 
+    Problem();
     Problem(std::vector<Person> a);
     void read_input();
     void solve();

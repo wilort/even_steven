@@ -6,9 +6,9 @@
 #include <numeric>
 
 // constructor
-Problem::Problem(const std::vector<Person> a) {
-    /* people = a; */
-}
+Problem::Problem() { }
+Problem::Problem(const std::vector<Person> a) { }
+
 
 void Problem::read_input() {
     std::cout << "Reading input ..." << "\n";
@@ -34,7 +34,7 @@ void Problem::read_input() {
                 else if (column == 2){
                     payed = std::stoi(csvElement);
                 }
-                    column++;
+                column++;
             }
         people.emplace_back(name, phone_number, payed);
         }
@@ -67,6 +67,7 @@ void Problem::solve() {
         double maximum_recieve = p2->payed - desired_pay;
         double transaction = std::min(maximum_give, maximum_recieve);
         if(transaction > 0){
+
             transactions.emplace_back(*p1, *p2, transaction);
             p1->payed += transaction;
             p2->payed -= transaction;
@@ -84,9 +85,9 @@ void Problem::print_solution() {
             Person giver = std::get<0>(transaction);
             Person reciever = std::get<1>(transaction);
 
-            if(person.name == giver.name ){
+            if(person.name == giver.name){
                 double swish = std::get<2>(transaction);
-                std::cout << person.name << " gives " << swish << " to " << reciever.name << "("<< reciever.phone_number << ")"<<"\n";
+                std::cout << person.name << " gives " << swish << " to " << reciever.name << "(" << reciever.phone_number << ")" << "\n";
             }
             else if(person.name == reciever.name){
                 double swish = std::get<2>(transaction);
