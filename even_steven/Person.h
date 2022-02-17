@@ -10,6 +10,7 @@ public:
     std::string phone_number;
     double payed;
 
+    Person();
     Person(std::string a, std::string b, double c);
     /* bool operator < (const Person p); */
     void myFunction();

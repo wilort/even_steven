@@ -10,6 +10,12 @@ Problem::Problem() { }
 Problem::Problem(const std::vector<Person> a) { }
 
 
+Problem::Transaction::Transaction(Person a, Person b, double c) {
+  giver = a;
+  reciever = b;
+  amount = c;
+}
+
 void Problem::read_input() {
     std::cout << "Reading input ..." << "\n";
     std::ifstream csvFile("input");
@@ -76,22 +82,19 @@ void Problem::solve() {
     }
 };
 
-// TODO group together transactions prints more
-// make a struct out of transaction instead of a tuple
+// TODO group together transactions prints more so you can view transaction breakdown
 void Problem::print_solution() {
     std::cout << "Printing a nice solution ..." << "\n";
     for (Person person: people) {
-        for (std::tuple<Person, Person, double> transaction: transactions) {
-            Person giver = std::get<0>(transaction);
-            Person reciever = std::get<1>(transaction);
+        for (Transaction transaction: transactions) {
 
-            if(person.name == giver.name){
-                double swish = std::get<2>(transaction);
-                std::cout << person.name << " gives " << swish << " to " << reciever.name << "(" << reciever.phone_number << ")" << "\n";
+            if(person.name == transaction.giver.name){
+                double swish = transaction.amount;
+                std::cout << person.name << " gives " << swish << " to " << transaction.reciever.name << "(" << transaction.reciever.phone_number << ")" << "\n";
             }
-            else if(person.name == reciever.name){
-                double swish = std::get<2>(transaction);
-                std::cout << person.name << " recieves " << swish << " from " << giver.name << "\n";
+            else if(person.name == transaction.reciever.name){
+                double swish = transaction.amount;
+                std::cout << person.name << " recieves " << swish << " from " << transaction.giver.name << "\n";
             }
         }
     }
@@ -99,7 +102,7 @@ void Problem::print_solution() {
     double sum_of_transactions = std::accumulate(transactions.begin(),
                                                  transactions.end(),
                                                  0,
-                                                 [](double a, std::tuple<Person, Person, double> b) { return a + std::get<2>(b); });
+                                                 [](double a, Transaction b) { return a + b.amount; });
     std::cout << "sum of transactions: " << sum_of_transactions << "\n";
 
 };

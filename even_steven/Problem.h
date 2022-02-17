@@ -7,9 +7,19 @@ private:
 
 
 public:
+    struct Transaction{
+      Person giver;
+      Person reciever;
+      double amount;
+      Transaction(Person a, Person b, double c);
+      /* Transaction(Person a, Person b, double c){ */
+      /*   giver = a; */
+      /*   reciever = b; */
+      /*   amount = c; */
+      /* } */
+    };
     std::vector<Person> people;
-    std::vector<std::tuple<Person, Person, double>> transactions;
-
+    std::vector<Transaction> transactions;
     Problem();
     Problem(std::vector<Person> a);
     void read_input();
