@@ -17,7 +17,7 @@ Problem::Transaction::Transaction(Person a, Person b, double c) {
 }
 
 void Problem::read_input() {
-    std::cout << "Reading input ..." << "\n";
+    std::cout << "Reading input ..." << std::endl;
     std::ifstream csvFile("input");
     if (csvFile.is_open()){
 
@@ -46,13 +46,13 @@ void Problem::read_input() {
         }
     }
     else{
-        std::cout << "no file found" << "\n";
+        std::cout << "no file found" << std::endl;
     }
     csvFile.close();
 }
 
 void Problem::solve() {
-    std::cout << "Initiating problem solving ..." << "\n";
+    std::cout << "Initiating problem solving ..." << std::endl;
 
     double total_payed = std::accumulate(people.begin(),
                                          people.end(),
@@ -62,51 +62,80 @@ void Problem::solve() {
     int number_of_people = people.size();
     double desired_pay = total_payed / number_of_people;
 
-    std::cout << "Everyone should pay " << desired_pay << "\n";
+    std::cout << "Everyone should pay " << desired_pay << std::endl;
 
     std::sort(people.begin(), people.end(), [](Person a, Person b) { return a.payed < b.payed; });
 
-    auto p1 = people.begin();
-    auto p2 = people.end() - 1;
-    while (p1 < p2){
-        double maximum_give = desired_pay - p1->payed;
-        double maximum_recieve = p2->payed - desired_pay;
-        double transaction = std::min(maximum_give, maximum_recieve);
-        if(transaction > 0){
+    auto giver = people.begin();
+    auto reciever = people.end() - 1;
+    double pay = 0;
+    double recieve = 0;
+    while (giver < reciever){
 
-            transactions.emplace_back(*p1, *p2, transaction);
-            p1->payed += transaction;
-            p2->payed -= transaction;
+        const double maximum_give = desired_pay - giver->payed - pay;
+        const double maximum_recieve = reciever->payed + recieve - desired_pay;
+        const double amount = std::min(maximum_give, maximum_recieve);
+
+        transactions.emplace_back(*giver, *reciever, amount);
+        pay += amount;
+        recieve -= amount;
+
+        if(maximum_give > 0){
+          --reciever;
+          recieve = 0;
         }
-        p1->payed < desired_pay ? --p2 : ++p1;
+
+        if(maximum_recieve > 0){
+          ++giver;
+          pay = 0;
+        }
     }
 };
 
-// TODO group together transactions prints more so you can view transaction breakdown
-void Problem::print_solution() {
-    std::cout << "Printing a nice solution ..." << "\n";
-    for (Person person: people) {
-        for (Transaction transaction: transactions) {
 
+// TDDO
+// 1. group together transactions prints more so you can view transaction breakdown
+// 2. make use of input2 and apply weighted split
+// 3. add flags for different things. help menu etc: main --help
+void Problem::print_solution() {
+    std::cout << "Printing a nice solution ..." << std::endl;
+    for (Person person: people) {
+        std::cout << person.name
+                  << " has payed "
+                  << person.payed //this will always be 750 because we use person.payed in solve above.
+                  // Need to use a tmp variable in solve or else it will be wrong
+                  << std::endl;
+        double sum = 0;
+        for (Transaction transaction: transactions) {
             if(person.name == transaction.giver.name){
-                double swish = transaction.amount;
-                std::cout << person.name << " gives " << swish << " to " << transaction.reciever.name << "(" << transaction.reciever.phone_number << ")" << "\n";
+                std::cout << "    "
+                          << transaction.amount
+                          << " to "
+                          << transaction.reciever.name
+                          << "("
+                          << transaction.reciever.phone_number
+                          << ")"
+                          << std::endl;
+                sum += transaction.amount;
             }
             else if(person.name == transaction.reciever.name){
-                double swish = transaction.amount;
-                std::cout << person.name << " recieves " << swish << " from " << transaction.giver.name << "\n";
+                std::cout << "    "
+                          << transaction.amount
+                          << " from "
+                          << transaction.giver.name
+                          << std::endl;
+                sum -= transaction.amount;
             }
         }
+        std::cout << "    will have payed "
+                  << person.payed + sum
+                  << std::endl;
     }
-    std::cout << "number of transactions: " << transactions.size() << "\n";
+    std::cout << "number of transactions: " << transactions.size() << std::endl;
     double sum_of_transactions = std::accumulate(transactions.begin(),
                                                  transactions.end(),
                                                  0,
                                                  [](double a, Transaction b) { return a + b.amount; });
-    std::cout << "sum of transactions: " << sum_of_transactions << "\n";
+    std::cout << "sum of transactions: " << sum_of_transactions << std::endl;
 
-};
-
-void Problem::myFunction() {
-    std::cout << "shiter" << "\n";
 };
