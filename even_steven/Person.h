@@ -9,6 +9,7 @@ public:
     std::string name;
     std::string phone_number;
     double payed;
+    double owes;
 
     Person();
     Person(std::string a, std::string b, double c);

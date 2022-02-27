@@ -4,6 +4,7 @@
 #include <sstream>
 #include <algorithm>
 #include <numeric>
+#include <map>
 
 // constructor
 Problem::Problem() { }
@@ -15,6 +16,127 @@ Problem::Transaction::Transaction(Person a, Person b, double c) {
   reciever = b;
   amount = c;
 }
+
+void Problem::readNamesAndNumbers() {
+    std::cout << "Reading numbers ..." << std::endl;
+    std::ifstream csvFile("numbers");
+    if (csvFile.is_open()){
+
+        std::string csvLine;
+        std::string name, phone_number;
+
+        while (std::getline(csvFile, csvLine)){
+            std::istringstream csvStream(csvLine);
+            std::string csvElement;
+
+            int column = 0;
+            while(std::getline(csvStream, csvElement, ',') ) {
+                if (column == 0){
+                    name = csvElement;
+                }
+                else if (column == 1){
+                    phone_number = csvElement;
+                }
+                column++;
+            }
+        double payed = 0.0;
+        people.emplace_back(name, phone_number, payed);
+        }
+    }
+    else{
+        std::cout << "no file found" << std::endl;
+    }
+    csvFile.close();
+}
+
+void Problem:: readCosts(){
+    std::cout << "Reading costs ..." << std::endl;
+    std::ifstream csvFile("costs");
+    if (csvFile.is_open()){
+
+
+        std::string csvLine;
+        std::string name, phone_number;
+        std::map<int, std::string> mapColumnToName;
+        std::map<int, int> mapRowToNumberOfBorrowers;
+
+        // map a column number to a name
+        // map a row to number of borrowers
+        int row = 0;
+        while (std::getline(csvFile, csvLine)){
+            std::istringstream csvStream(csvLine);
+            std::string csvElement;
+            int column = 0;
+
+            // identify column number with a name
+            if (row == 0){
+                while(std::getline(csvStream, csvElement, ',') ) {
+                    if (column > 2){
+                        mapColumnToName.emplace(column, csvElement);
+                        std::cout << " column " << column << " maps to " << csvElement << std::endl;
+                    }
+                    ++column;
+                }
+            } else {
+                int numberOfBorrowers = 0;
+                while(std::getline(csvStream, csvElement, ',') ) {
+                    if (column == 0){
+                        // lender
+                    } else if (column == 1){
+                        // amount
+                    } else if (column == 2){
+                        // description column. Do nothing
+                    } else if (stoi(csvElement) == 1){
+                      ++numberOfBorrowers;
+                    }
+                    ++column;
+                }
+                mapRowToNumberOfBorrowers.emplace(row, numberOfBorrowers);
+                std::cout << "row" << row << " has " << numberOfBorrowers << " borrowers " << std::endl;
+            }
+            ++row;
+        }
+        csvFile.clear();
+        csvFile.seekg(0);
+
+
+        // distribute costs and who owes how much
+        row = 0;
+        while (std::getline(csvFile, csvLine)){
+            std::istringstream csvStream(csvLine);
+            std::string csvElement;
+            int column = 0;
+
+            if ( row > 0) {
+                std::vector<Person>::iterator lender;
+                std::vector<Person>::iterator borrower;
+                double amount;
+                while(std::getline(csvStream, csvElement, ',') ) {
+                    if (column == 0){
+                        name = csvElement;
+                        lender = std::find_if(people.begin(), people.end(), [&name](const Person p){return p.name == name;});
+                    } else if (column == 1){
+                        amount = std::stoi(csvElement);
+                        lender->payed += amount;
+                    } else if (column == 2){
+                        // description column. Do nothing
+                    } else if (stoi(csvElement) == 1){
+                        std::string columnName = mapColumnToName[column];
+                        borrower = std::find_if(people.begin(), people.end(), [&columnName](const Person p){return p.name == columnName;});
+                        borrower->owes += amount / mapRowToNumberOfBorrowers[row];
+                        std::cout << borrower->name << " owes " << amount / mapRowToNumberOfBorrowers[row] << std::endl;
+                    }
+                    ++column;
+                }
+            }
+            ++row;
+        }
+    } else{
+        std::cout << "no file found" << std::endl;
+    }
+    csvFile.close();
+}
+
 
 void Problem::read_input() {
     std::cout << "Reading input ..." << std::endl;
