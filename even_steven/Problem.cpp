@@ -17,7 +17,7 @@ Problem::Transaction::Transaction(Person a, Person b, double c) {
   amount = c;
 }
 
-void Problem::readNamesAndNumbers() {
+void Problem::readNumbers() {
     std::cout << "Reading numbers ..." << std::endl;
     std::ifstream csvFile("numbers");
     if (csvFile.is_open()){
@@ -56,7 +56,7 @@ void Problem:: readCosts(){
 
 
         std::string csvLine;
-        std::string name, phone_number;
+        std::string name;
         std::map<int, std::string> mapColumnToName;
         std::map<int, int> mapRowToNumberOfBorrowers;
 
@@ -64,36 +64,27 @@ void Problem:: readCosts(){
         // map a row to number of borrowers
         int row = 0;
         while (std::getline(csvFile, csvLine)){
+            // remove white space from input
+            csvLine.erase(std::remove_if(csvLine.begin(), csvLine.end(), ::isspace), csvLine.end());
+
             std::istringstream csvStream(csvLine);
             std::string csvElement;
             int column = 0;
+            int numberOfBorrowers = 0;
 
             // identify column number with a name
-            if (row == 0){
-                while(std::getline(csvStream, csvElement, ',') ) {
-                    if (column > 2){
-                        mapColumnToName.emplace(column, csvElement);
-                        std::cout << " column " << column << " maps to " << csvElement << std::endl;
-                    }
-                    ++column;
+            while(std::getline(csvStream, csvElement, ',') ) {
+                // column 0,1,2 correspond to name, amount and description respectively
+                if (row == 0 && column > 2){
+                    mapColumnToName.emplace(column, csvElement);
+                    std::cout << " column " << column << " maps to " << csvElement << std::endl;
+                } else if(column > 2 && stoi(csvElement) == 1){
+                    ++numberOfBorrowers;
                 }
-            } else {
-                int numberOfBorrowers = 0;
-                while(std::getline(csvStream, csvElement, ',') ) {
-                    if (column == 0){
-                        // lender
-                    } else if (column == 1){
-                        // amount
-                    } else if (column == 2){
-                        // description column. Do nothing
-                    } else if (stoi(csvElement) == 1){
-                      ++numberOfBorrowers;
-                    }
-                    ++column;
-                }
-                mapRowToNumberOfBorrowers.emplace(row, numberOfBorrowers);
-                std::cout << "row" << row << " has " << numberOfBorrowers << " borrowers " << std::endl;
+                ++column;
             }
+            mapRowToNumberOfBorrowers.emplace(row, numberOfBorrowers);
+            std::cout << "row" << row << " has " << numberOfBorrowers << " borrowers " << std::endl;
             ++row;
         }
         csvFile.clear();
@@ -103,10 +94,12 @@ void Problem:: readCosts(){
         // distribute costs and who owes how much
         row = 0;
         while (std::getline(csvFile, csvLine)){
+            // remove white space from input
+            csvLine.erase(std::remove_if(csvLine.begin(), csvLine.end(), ::isspace), csvLine.end());
+
             std::istringstream csvStream(csvLine);
             std::string csvElement;
             int column = 0;
-
             if ( row > 0) {
                 std::vector<Person>::iterator lender;
                 std::vector<Person>::iterator borrower;
@@ -114,10 +107,12 @@ void Problem:: readCosts(){
                 while(std::getline(csvStream, csvElement, ',') ) {
                     if (column == 0){
                         name = csvElement;
+                        std::cout << "---" << name << "---" << std::endl;
                         lender = std::find_if(people.begin(), people.end(), [&name](const Person p){return p.name == name;});
                     } else if (column == 1){
                         amount = std::stoi(csvElement);
                         lender->payed += amount;
+                        std::cout << lender->name << " payed " << amount << std::endl;
                     } else if (column == 2){
                         // description column. Do nothing
                     } else if (stoi(csvElement) == 1){
@@ -137,6 +132,42 @@ void Problem:: readCosts(){
     csvFile.close();
 }
 
+void Problem::solve() {
+    std::cout << "Initiating problem solving ..." << std::endl;
+
+    double total_payed = std::accumulate(people.begin(),
+                                         people.end(),
+                                         0,
+                                         [](double a, Person b) { return a + b.payed; });
+
+
+    std::sort(people.begin(), people.end(), [](Person a, Person b) { return a.payed < b.payed; });
+
+    auto giver = people.begin();
+    auto reciever = people.end() - 1;
+    double pay = 0;
+    double recieve = 0;
+    while (giver < reciever){
+
+        const double maximum_give = giver->owes - giver->payed - pay;
+        const double maximum_recieve = reciever->payed + recieve - reciever->owes;
+        const double amount = std::min(maximum_give, maximum_recieve);
+
+        transactions.emplace_back(*giver, *reciever, amount);
+        pay += amount;
+        recieve -= amount;
+
+        if(maximum_give > 0){
+          --reciever;
+          recieve = 0;
+        }
+
+        if(maximum_recieve > 0){
+          ++giver;
+          pay = 0;
+        }
+    }
+};
 
 void Problem::read_input() {
     std::cout << "Reading input ..." << std::endl;
@@ -173,46 +204,46 @@ void Problem::read_input() {
     csvFile.close();
 }
 
-void Problem::solve() {
-    std::cout << "Initiating problem solving ..." << std::endl;
+/* void Problem::solve() { */
+/*     std::cout << "Initiating problem solving ..." << std::endl; */
 
-    double total_payed = std::accumulate(people.begin(),
-                                         people.end(),
-                                         0,
-                                         [](double a, Person b) { return a + b.payed; });
+/*     double total_payed = std::accumulate(people.begin(), */
+/*                                          people.end(), */
+/*                                          0, */
+/*                                          [](double a, Person b) { return a + b.payed; }); */
 
-    int number_of_people = people.size();
-    double desired_pay = total_payed / number_of_people;
+/*     int number_of_people = people.size(); */
+/*     double desired_pay = total_payed / number_of_people; */
 
-    std::cout << "Everyone should pay " << desired_pay << std::endl;
+/*     std::cout << "Everyone should pay " << desired_pay << std::endl; */
 
-    std::sort(people.begin(), people.end(), [](Person a, Person b) { return a.payed < b.payed; });
+/*     std::sort(people.begin(), people.end(), [](Person a, Person b) { return a.payed < b.payed; }); */
 
-    auto giver = people.begin();
-    auto reciever = people.end() - 1;
-    double pay = 0;
-    double recieve = 0;
-    while (giver < reciever){
+/*     auto giver = people.begin(); */
+/*     auto reciever = people.end() - 1; */
+/*     double pay = 0; */
+/*     double recieve = 0; */
+/*     while (giver < reciever){ */
 
-        const double maximum_give = desired_pay - giver->payed - pay;
-        const double maximum_recieve = reciever->payed + recieve - desired_pay;
-        const double amount = std::min(maximum_give, maximum_recieve);
+/*         const double maximum_give = desired_pay - giver->payed - pay; */
+/*         const double maximum_recieve = reciever->payed + recieve - desired_pay; */
+/*         const double amount = std::min(maximum_give, maximum_recieve); */
 
-        transactions.emplace_back(*giver, *reciever, amount);
-        pay += amount;
-        recieve -= amount;
+/*         transactions.emplace_back(*giver, *reciever, amount); */
+/*         pay += amount; */
+/*         recieve -= amount; */
 
-        if(maximum_give > 0){
-          --reciever;
-          recieve = 0;
-        }
+/*         if(maximum_give > 0){ */
+/*           --reciever; */
+/*           recieve = 0; */
+/*         } */
 
-        if(maximum_recieve > 0){
-          ++giver;
-          pay = 0;
-        }
-    }
-};
+/*         if(maximum_recieve > 0){ */
+/*           ++giver; */
+/*           pay = 0; */
+/*         } */
+/*     } */
+/* }; */
 
 
 // TDDO

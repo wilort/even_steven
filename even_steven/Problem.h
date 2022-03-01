@@ -22,7 +22,7 @@ public:
     std::vector<Transaction> transactions;
     Problem();
     Problem(std::vector<Person> a);
-    void readNamesAndNumbers();
+    void readNumbers();
     void readCosts();
     void read_input();
     void read_input2();
