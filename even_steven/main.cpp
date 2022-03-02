@@ -7,7 +7,7 @@ int main() {
     /* problem.read_input2(); */
     problem.readNumbers();
     problem.readCosts();
-    problem.solve();
-    problem.print_solution();
+    /* problem.solve(); */
+    /* problem.print_solution(); */
     return 0;
 }

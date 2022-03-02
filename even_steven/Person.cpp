@@ -8,7 +8,7 @@
 Person::Person(){}
 Person::Person(std::string a, std::string b, double c) {
     name = a;
-    phone_number = b;
+    number = b;
     payed = c;
 }
 

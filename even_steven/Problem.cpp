@@ -23,7 +23,7 @@ void Problem::readNumbers() {
     if (csvFile.is_open()){
 
         std::string csvLine;
-        std::string name, phone_number;
+        std::string name, number;
 
         while (std::getline(csvFile, csvLine)){
             std::istringstream csvStream(csvLine);
@@ -35,12 +35,12 @@ void Problem::readNumbers() {
                     name = csvElement;
                 }
                 else if (column == 1){
-                    phone_number = csvElement;
+                    number = csvElement;
                 }
                 column++;
             }
         double payed = 0.0;
-        people.emplace_back(name, phone_number, payed);
+        people.emplace_back(name, number, payed);
         }
     }
     else{
@@ -58,7 +58,6 @@ void Problem:: readCosts(){
         std::string csvLine;
         std::string name;
         std::map<int, std::string> mapColumnToName;
-        std::map<int, int> mapRowToNumberOfBorrowers;
 
         // map a column number to a name
         // map a row to number of borrowers
@@ -67,7 +66,7 @@ void Problem:: readCosts(){
             // remove white space from input
             csvLine.erase(std::remove_if(csvLine.begin(), csvLine.end(), ::isspace), csvLine.end());
 
-            std::istringstream csvStream(csvLine);
+            std::stringstream csvStream(csvLine);
             std::string csvElement;
             int column = 0;
             int numberOfBorrowers = 0;
@@ -83,49 +82,44 @@ void Problem:: readCosts(){
                 }
                 ++column;
             }
-            mapRowToNumberOfBorrowers.emplace(row, numberOfBorrowers);
+
             std::cout << "row" << row << " has " << numberOfBorrowers << " borrowers " << std::endl;
-            ++row;
-        }
-        csvFile.clear();
-        csvFile.seekg(0);
 
 
-        // distribute costs and who owes how much
-        row = 0;
-        while (std::getline(csvFile, csvLine)){
-            // remove white space from input
-            csvLine.erase(std::remove_if(csvLine.begin(), csvLine.end(), ::isspace), csvLine.end());
-
-            std::istringstream csvStream(csvLine);
-            std::string csvElement;
-            int column = 0;
             if ( row > 0) {
-                std::vector<Person>::iterator lender;
+                csvStream.clear();
+                csvStream.seekg(0);
+                column = 0;
+                std::vector<Person>::iterator payer;
                 std::vector<Person>::iterator borrower;
                 double amount;
                 while(std::getline(csvStream, csvElement, ',') ) {
                     if (column == 0){
                         name = csvElement;
-                        std::cout << "---" << name << "---" << std::endl;
-                        lender = std::find_if(people.begin(), people.end(), [&name](const Person p){return p.name == name;});
+                        payer = std::find_if(people.begin(), people.end(), [&name](const Person p){return p.name == name;});
                     } else if (column == 1){
                         amount = std::stoi(csvElement);
-                        lender->payed += amount;
-                        std::cout << lender->name << " payed " << amount << std::endl;
+                        payer->payed += amount;
+                        std::cout << payer->name << " payed " << amount << std::endl;
                     } else if (column == 2){
                         // description column. Do nothing
                     } else if (stoi(csvElement) == 1){
                         std::string columnName = mapColumnToName[column];
                         borrower = std::find_if(people.begin(), people.end(), [&columnName](const Person p){return p.name == columnName;});
-                        borrower->owes += amount / mapRowToNumberOfBorrowers[row];
-                        std::cout << borrower->name << " owes " << amount / mapRowToNumberOfBorrowers[row] << std::endl;
+                        borrower->borrowed += amount / numberOfBorrowers;
+                        std::cout << borrower->name << " owes " << amount / numberOfBorrowers << std::endl;
                     }
                     ++column;
                 }
             }
             ++row;
         }
+        /* for(auto p:people){ */
+        /*   std::cout << p.name << std::endl; */
+        /*   std::cout << p.number << std::endl; */
+        /*   std::cout << "payed: " << p.payed << std::endl; */
+        /*   std::cout << "borrowed: " << p.borrowed << std::endl; */
+        /* } */
     } else{
         std::cout << "no file found" << std::endl;
     }
@@ -169,40 +163,6 @@ void Problem::solve() {
     }
 };
 
-void Problem::read_input() {
-    std::cout << "Reading input ..." << std::endl;
-    std::ifstream csvFile("input");
-    if (csvFile.is_open()){
-
-        std::string csvLine;
-        std::string name, phone_number;
-        double payed;
-
-        while (std::getline(csvFile, csvLine)){
-            std::istringstream csvStream(csvLine);
-            std::string csvElement;
-
-            int column = 0;
-            while(std::getline(csvStream, csvElement, ',') ) {
-                if (column == 0){
-                    name = csvElement;
-                }
-                else if (column == 1){
-                    phone_number = csvElement;
-                }
-                else if (column == 2){
-                    payed = std::stoi(csvElement);
-                }
-                column++;
-            }
-        people.emplace_back(name, phone_number, payed);
-        }
-    }
-    else{
-        std::cout << "no file found" << std::endl;
-    }
-    csvFile.close();
-}
 
 /* void Problem::solve() { */
 /*     std::cout << "Initiating problem solving ..." << std::endl; */
@@ -266,7 +226,7 @@ void Problem::print_solution() {
                           << " to "
                           << transaction.reciever.name
                           << "("
-                          << transaction.reciever.phone_number
+                          << transaction.reciever.number
                           << ")"
                           << std::endl;
                 sum += transaction.amount;

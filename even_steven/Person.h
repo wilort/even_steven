@@ -7,8 +7,9 @@ private:
 
 public:
     std::string name;
-    std::string phone_number;
+    std::string number;
     double payed;
+    double borrowed;
     double owes;
 
     Person();
