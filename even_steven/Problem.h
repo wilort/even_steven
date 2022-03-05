@@ -22,10 +22,8 @@ public:
     std::vector<Transaction> transactions;
     Problem();
     Problem(std::vector<Person> a);
-    void readNumbers();
-    void readCosts();
-    void read_input();
-    void read_input2();
+    void readNumbers(std::string fileName);
+    void readCosts(std::string fileName);
     void solve();
     void print_solution();
     void myFunction();

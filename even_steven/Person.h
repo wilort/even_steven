@@ -10,7 +10,6 @@ public:
     std::string number;
     double payed;
     double borrowed;
-    double owes;
 
     Person();
     Person(std::string a, std::string b, double c);
