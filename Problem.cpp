@@ -8,8 +8,6 @@
 
 // constructor
 Problem::Problem() { }
-Problem::Problem(const std::vector<Person> a) { }
-
 
 Problem::Transaction::Transaction(Person _giver, Person _reciever, double _amount) {
   giver = _giver;
@@ -17,7 +15,7 @@ Problem::Transaction::Transaction(Person _giver, Person _reciever, double _amoun
   amount = _amount;
 }
 
-void Problem::readNumbers(std::string fileName) {
+void Problem::readNumbers(const std::string fileName) {
     std::cout << "Reading numbers ..." << std::endl;
     std::ifstream csvFile(fileName);
     if (csvFile.is_open()){
@@ -49,7 +47,7 @@ void Problem::readNumbers(std::string fileName) {
     csvFile.close();
 }
 
-void Problem::readCosts(std::string fileName){
+void Problem::readCosts(const std::string fileName){
     std::cout << "Reading costs ..." << std::endl;
     std::ifstream csvFile(fileName);
     if (csvFile.is_open()){
@@ -150,8 +148,9 @@ void Problem::solve() {
 // "evensteven -c costs -n numbers"
 // 2. add flags for different things. help menu etc: main --help
 // 3. make it possible to weight the inputs unevenly
-void Problem::print_solution() {
+void Problem::print_solution() const {
     std::cout << "Printing solution ..." << std::endl;
+
     for (Person person: people) {
         std::cout << person.name
                   << " has payed "
@@ -185,11 +184,11 @@ void Problem::print_solution() {
                   << person.payed + sum
                   << std::endl;
     }
+
     std::cout << "number of transactions: " << transactions.size() << std::endl;
     double sum_of_transactions = std::accumulate(transactions.begin(),
                                                  transactions.end(),
                                                  0,
                                                  [](double a, Transaction b) { return a + b.amount; });
     std::cout << "sum of transactions: " << sum_of_transactions << std::endl;
-
 };
