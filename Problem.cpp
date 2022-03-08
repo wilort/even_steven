@@ -11,10 +11,10 @@ Problem::Problem() { }
 Problem::Problem(const std::vector<Person> a) { }
 
 
-Problem::Transaction::Transaction(Person a, Person b, double c) {
-  giver = a;
-  reciever = b;
-  amount = c;
+Problem::Transaction::Transaction(Person _giver, Person _reciever, double _amount) {
+  giver = _giver;
+  reciever = _reciever;
+  amount = _amount;
 }
 
 void Problem::readNumbers(std::string fileName) {

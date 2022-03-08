@@ -11,12 +11,7 @@ public:
       Person giver;
       Person reciever;
       double amount;
-      Transaction(Person a, Person b, double c);
-      /* Transaction(Person a, Person b, double c){ */
-      /*   giver = a; */
-      /*   reciever = b; */
-      /*   amount = c; */
-      /* } */
+      Transaction(Person _giver, Person _reciever, double _amount);
     };
     std::vector<Person> people;
     std::vector<Transaction> transactions;
