@@ -2,19 +2,13 @@
 #include <string>
 #include <iostream>
 
-// testing
-
 // constructor
 Person::Person(){}
-Person::Person(std::string a, std::string b, double c) {
-    name = a;
-    number = b;
-    payed = c;
+Person::Person(std::string _name, std::string _number, double _payed) {
+    name = _name;
+    number = _number;
+    payed = _payed;
 }
-
-/* bool Person::operator < (const Person& p){ */
-/*     return (balance < p.balance); */
-/* } */
 
 void Person::myFunction() {
     std::cout << "shiter" << "\n";

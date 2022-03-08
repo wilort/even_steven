@@ -4,7 +4,6 @@
 class Person{
 private:
 
-
 public:
     std::string name;
     std::string number;
@@ -13,7 +12,5 @@ public:
 
     Person();
     Person(std::string a, std::string b, double c);
-    /* bool operator < (const Person p); */
     void myFunction();
-
 };
