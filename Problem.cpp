@@ -74,15 +74,11 @@ void Problem::readCosts(std::string fileName){
                 if (row == 0 && column > 2){
                     mapColumnToName.emplace(column, csvElement);
                     people.emplace_back(csvElement, "", 0.0);
-                    /* std::cout << " column " << column << " maps to " << csvElement << std::endl; */
                 } else if(column > 2 && stoi(csvElement) == 1){
                     ++numberOfBorrowers;
                 }
                 ++column;
             }
-
-            /* std::cout << "row" << row << " has " << numberOfBorrowers << " borrowers " << std::endl; */
-
 
             if ( row > 0) {
                 csvStream.clear();
@@ -119,37 +115,22 @@ void Problem::readCosts(std::string fileName){
 }
 
 void Problem::solve() {
-    std::cout << "Initiating problem solving ..." << std::endl;
+    std::cout << "Solving problem ..." << std::endl;
 
     std::sort(people.begin(),
               people.end(),
               [](Person a, Person b) { return a.payed-a.borrowed < b.payed-b.borrowed; });
-    /* for(auto p:people){ */
-    /*   std::cout << p.name << std::endl; */
-    /*   std::cout << p.number << std::endl; */
-    /*   std::cout << "payed: " << p.payed << std::endl; */
-    /*   std::cout << "borrowed: " << p.borrowed << std::endl; */
-    /* } */
     auto giver = people.begin();
     auto reciever = people.end() - 1;
     double give = 0;
     double recieve = 0;
 
-    /* int i = 0; */
     while (giver < reciever){
-        /* std::cout << "----------" << i << "---------------" << std::endl; */
-        /* std::cout << "giver is now " << giver->name << std::endl; */
-        /* std::cout << "reciever is now " << reciever->name << std::endl; */
         const double maximum_give = giver->borrowed - giver->payed - give;
         const double maximum_recieve = reciever->payed - reciever->borrowed + recieve;
-        /* const double maximum_give = std::max(giver->borrowed - giver->payed, 0.0) - give; */
-        /* const double maximum_recieve = std::max(reciever->payed - reciever->borrowed, 0.0) + recieve; */
         const double amount = std::min(maximum_give, maximum_recieve);
 
-        /* std::cout << "max give is " << maximum_give << std::endl; */
-        /* std::cout << "max recieve is " << maximum_recieve << std::endl; */
         transactions.emplace_back(*giver, *reciever, amount);
-        /* std::cout << giver->name << " gives " << amount << " to " << reciever->name << std::endl; */
         give += amount;
         recieve -= amount;
 
@@ -160,7 +141,6 @@ void Problem::solve() {
           --reciever;
           recieve = 0;
         }
-        /* ++i; */
     }
 };
 
@@ -171,12 +151,12 @@ void Problem::solve() {
 // 2. add flags for different things. help menu etc: main --help
 // 3. make it possible to weight the inputs unevenly
 void Problem::print_solution() {
-    std::cout << "Printing a nice solution ..." << std::endl;
+    std::cout << "Printing solution ..." << std::endl;
     for (Person person: people) {
         std::cout << person.name
                   << " has payed "
-                  << person.payed //this will always be 750 because we use person.payed in solve above.
-                  << " and borrowed "// Need to use a tmp variable in solve or else it will be wrong
+                  << person.payed
+                  << " and borrowed "
                   << person.borrowed
                   << std::endl;
         double sum = 0;
