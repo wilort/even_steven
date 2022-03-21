@@ -6,7 +6,6 @@
 #include <numeric>
 #include <map>
 
-// constructor
 Problem::Problem() { }
 
 Problem::Transaction::Transaction(Person _giver, Person _reciever, double _amount) {
@@ -148,47 +147,58 @@ void Problem::solve() {
 // "evensteven -c costs -n numbers"
 // 2. add flags for different things. help menu etc: main --help
 // 3. make it possible to weight the inputs unevenly
-void Problem::print_solution() const {
-    std::cout << "Printing solution ..." << std::endl;
+void Problem::printPayedAndBorrowed(const Person person) const {
+    std::cout << person.name << std::endl;
+    std::cout << "    "
+              << -person.payed
+              << " payed"
+              << std::endl;
+    std::cout << "    "
+              << person.borrowed
+              << " borrowed "
+              << std::endl;
+}
 
-    for (Person person: people) {
-        std::cout << person.name
-                  << " has payed "
-                  << person.payed
-                  << " and borrowed "
-                  << person.borrowed
-                  << std::endl;
-        double sum = 0;
-        for (Transaction transaction: transactions) {
-            if(person.name == transaction.giver.name){
-                std::cout << "    "
-                          << transaction.amount
-                          << " to "
-                          << transaction.reciever.name
-                          << "("
-                          << transaction.reciever.number
-                          << ")"
-                          << std::endl;
-                sum += transaction.amount;
-            }
-            else if(person.name == transaction.reciever.name){
-                std::cout << "    "
-                          << transaction.amount
-                          << " from "
-                          << transaction.giver.name
-                          << std::endl;
-                sum -= transaction.amount;
-            }
+void Problem::printTransactions(const Person person) const {
+    double sum = 0;
+    for (Transaction transaction: transactions) {
+        if(person.name == transaction.giver.name){
+            std::cout << "    "
+                      << -transaction.amount
+                      << " to "
+                      << transaction.reciever.name
+                      << "("
+                      << transaction.reciever.number
+                      << ")"
+                      << std::endl;
+            sum -= transaction.amount;
         }
-        std::cout << "    will have payed "
-                  << person.payed + sum
-                  << std::endl;
+        else if(person.name == transaction.reciever.name){
+            std::cout << "    "
+                      << transaction.amount
+                      << " from "
+                      << transaction.giver.name
+                      << std::endl;
+            sum += transaction.amount;
+        }
     }
+    std::cout << "    " << -person.payed + sum << " outgoing balance\n" << std::endl;
+}
 
+void Problem::printSummary() const {
     std::cout << "number of transactions: " << transactions.size() << std::endl;
     double sum_of_transactions = std::accumulate(transactions.begin(),
                                                  transactions.end(),
                                                  0,
                                                  [](double a, Transaction b) { return a + b.amount; });
     std::cout << "sum of transactions: " << sum_of_transactions << std::endl;
+}
+
+void Problem::printSolution() const {
+    std::cout << "Printing solution ...\n" << std::endl;
+    for (Person person: people) {
+        printPayedAndBorrowed(person);
+        printTransactions(person);
+    }
+    printSummary();
 };

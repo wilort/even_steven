@@ -19,5 +19,8 @@ public:
     void readNumbers(const std::string fileName);
     void readCosts(const std::string fileName);
     void solve();
-    void print_solution() const;
+    void printPayedAndBorrowed(const Person person) const;
+    void printTransactions(const Person person) const;
+    void printSolution() const;
+    void printSummary() const;
 };
