@@ -1,4 +1,3 @@
-lender, amount, description,olof,olle,feli
-  olof,    500,      SHITER,   1,   1,   1
-  olle,    500,      SHITER,   1,   1,   1
-  feli,    500,      SHITER,   1,   1,   1
+lender, amount, description,olof,olle
+  olof,    500,      SHITER,   1,   0
+  olle,    500,      SHITER,   0,   1
