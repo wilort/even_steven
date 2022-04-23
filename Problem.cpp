@@ -1,5 +1,6 @@
 #include "Problem.h"
 #include "Person.h"
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -15,134 +16,116 @@ Problem::Transaction::Transaction(Person _giver, Person _reciever, double _amoun
   amount = _amount;
 }
 
-void Problem::readNumbers(const std::string fileName) {
-    std::cout << "Reading numbers ..." << std::endl;
+void removeWhiteSpace(std::string& s){
+    s.erase(std::remove_if(s.begin(), s.end(), isspace), s.end());
+}
+
+std::vector<std::string> readLine(std::string csvLine){
+
+    removeWhiteSpace(csvLine);
+    std::istringstream csvStream(csvLine);
+    std::string csvElement;
+    std::vector<std::string> line;
+    while(std::getline(csvStream, csvElement, ',') ) {
+        line.emplace_back(csvElement);
+    }
+    return line;
+}
+
+std::vector<std::vector<std::string > > readLines(std::ifstream& csvFile){
+    std::vector<std::vector<std::string > > lines;
+    std::string csvLine;
+    while (std::getline(csvFile, csvLine)){
+        std::vector<std::string> line = readLine(csvLine);
+        lines.emplace_back(line);
+    }
+    return lines;
+}
+
+std::vector<std::vector<std::string > > readFile(const std::string fileName){
+    std::cout << "Reading " << fileName << std::endl;
     std::ifstream csvFile(fileName);
+    std::vector<std::vector<std::string > > lines;
     if (csvFile.is_open()){
-
-        std::string csvLine;
-        std::string name, number;
-
-        while (std::getline(csvFile, csvLine)){
-            std::istringstream csvStream(csvLine);
-            std::string csvElement;
-
-            int column = 0;
-            while(std::getline(csvStream, csvElement, ',') ) {
-                if (column == 0){
-                    name = csvElement;
-                }
-                else if (column == 1){
-                    number = csvElement;
-                }
-                column++;
-            }
-        auto person = std::find_if(people.begin(), people.end(), [&name](const Person p){return p.name == name;});
-        person->number = number;
-        }
+        lines = readLines(csvFile);
     }
     else{
         std::cout << "no file found" << std::endl;
     }
     csvFile.close();
+    return lines;
 }
 
-void Problem::readHeaderLine(std::string csvLine){
-
-    std::stringstream csvStream(csvLine);
-    std::string csvElement;
-    int column = 0;
-    while(std::getline(csvStream, csvElement, ',') ) {
-        // column 0,1,2 are the column headers name, amount and description respectively
-        if (column > 2){
-            std::string name = csvElement;
-            mapColumnToName.emplace(column, name);
-            people.emplace_back(name, "", 0.0);
-        }
-        ++column;
+void Problem::readNumbers(std::string filename){
+    std::vector<std::vector<std::string > > lines = readFile(filename);
+    for(std::vector<std::string> line : lines){
+      std::string name = line[0];
+      std::string number = line[1];
+      auto person = findPerson(name);
+      person->number = number;
     }
 }
 
-int getNumberOfBorrowers(std::string csvLine){
-    std::stringstream csvStream(csvLine);
-    std::string csvElement;
-    int column = 0;
+int getNumberOfBorrowers(std::vector<std::string> line) {
     int numberOfBorrowers;
-    while(std::getline(csvStream, csvElement, ',') ) {
-        // column 0,1,2 correspond to name, amount and description respectively
-        if(column > 2 && stoi(csvElement) == 1){
+    for(auto e = line.begin() + 3; e != line.end(); ++e){
+        if (stoi(*e) == 1){
             ++numberOfBorrowers;
         }
-        ++column;
     }
     return numberOfBorrowers;
 }
 
-void Problem::readLine(std::string csvLine){
-    int numberOfBorrowers = getNumberOfBorrowers(csvLine);
+void Problem::readCosts(std::string filename){
+    std::vector<std::vector<std::string > > lines = readFile(filename);
 
-    std::stringstream csvStream(csvLine);
-    std::string csvElement;
-    std::string name;
-    int column = 0;
-    std::vector<Person>::iterator payer;
-    std::vector<Person>::iterator borrower;
-    double amount;
-    while(std::getline(csvStream, csvElement, ',') ) {
-        if (column == 0){
-            name = csvElement;
-            payer = findPerson(name);
-        } else if (column == 1){
-            amount = std::stoi(csvElement);
-            payer->payed += amount;
-        } else if (column == 2){
-            // description column. Do nothing
-        } else if (stoi(csvElement) == 1){
-            std::string columnName = mapColumnToName[column];
-            borrower = findPerson(columnName);
-            if (payer != borrower){
-                borrower->borrowed += amount / numberOfBorrowers;
-            }
+    // createColumnMapAndpeople?(lines[0]);
+    // readHeaderAndCreateColumnMap(lines[0])
+    std::map<int, std::string> mapColumnToName;
+    std::vector<std::string> line = lines[0];
+    for(int column = 0; column < line.size(); ++column){
+        if(column > 2){
+            std::string name = line[column];
+            mapColumnToName.emplace(column, name);
+            people.emplace_back(name, "", 0.0);
         }
-        ++column;
+    }
+
+    // readBody();
+    for(auto line = lines.begin() + 1; line < lines.end(); ++line){
+        std::string name;
+        int amount;
+        int column = 0;
+        std::vector<Person>::iterator payer;
+        std::vector<Person>::iterator borrower;
+        int numberOfBorrowers = getNumberOfBorrowers(*line);
+        for(auto element = (*line).begin(); element < (*line).end(); ++element){
+        /* for(int column = 0; column < line->size(); ++column){ */
+            if (column == 0){
+                name = *element;
+                payer = findPerson(name);
+            } else if (column == 1){
+                amount = std::stoi(*element);
+                payer->payed += amount;
+            } else if (column > 2 && stoi(*element) == 1){
+                std::string columnName = mapColumnToName[column];
+                borrower = findPerson(columnName);
+                if (payer != borrower){
+                    borrower->borrowed += amount / numberOfBorrowers;
+                }
+            }
+            ++column;
+        }
     }
 }
 
 std::vector<Person>::iterator Problem::findPerson(std::string name){
-    std::vector<Person>::iterator person = std::find_if(people.begin(),
+    std::vector<Person>::iterator person =
+                          std::find_if(people.begin(),
                           people.end(),
                           [&name](const Person p){return p.name == name;});
     return person;
 }
-
-void Problem::readCsv(std::ifstream& csvFile){
-    std::string csvLine;
-    std::map<int, std::string> mapColumnToName;
-
-    int row = 0;
-    while (std::getline(csvFile, csvLine)){
-        // remove white space from line
-        csvLine.erase(std::remove_if(csvLine.begin(), csvLine.end(), ::isspace), csvLine.end());
-        if (row == 0){
-            readHeaderLine(csvLine);
-        } else {
-            readLine(csvLine);
-        }
-        ++row;
-    }
-}
-
-void Problem::readCosts(const std::string fileName){
-    std::cout << "Reading costs ..." << std::endl;
-    std::ifstream csvFile(fileName);
-    if (csvFile.is_open()){
-        readCsv(csvFile);
-    } else{
-        std::cout << "no file found" << std::endl;
-    }
-    csvFile.close();
-}
-
 
 void Problem::solve() {
     std::cout << "Solving problem ..." << std::endl;
