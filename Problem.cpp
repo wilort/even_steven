@@ -58,8 +58,7 @@ void Problem::readCosts(std::string filename){
         std::vector<Person>::iterator payer;
         std::vector<Person>::iterator borrower;
         int numberOfBorrowers = getNumberOfBorrowers(*line);
-        for(auto element = (*line).begin(); element < (*line).end(); ++element){
-        /* for(int column = 0; column < line->size(); ++column){ */
+        for(auto element = line->begin(); element < line->end(); ++element){
             if (column == 0){
                 name = *element;
                 payer = findPerson(name);
@@ -122,6 +121,7 @@ void Problem::solve() {
 // "evensteven -c costs -n numbers"
 // 2. add flags for different things. help menu etc: main --help
 // 3. make it possible to weight the inputs unevenly
+// 4. create unit-tests
 void Problem::printPayedAndBorrowed(const Person person) const {
     std::cout << person.name << std::endl;
     std::cout << "    "
