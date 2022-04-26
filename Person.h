@@ -11,6 +11,6 @@ public:
     double borrowed;
 
     Person();
-    Person(std::string a, std::string b, double c);
+    Person(std::string a);
     void myFunction();
 };

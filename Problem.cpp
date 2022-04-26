@@ -68,8 +68,8 @@ void Problem::readNumbers(std::string filename){
 
 int getNumberOfBorrowers(std::vector<std::string> line) {
     int numberOfBorrowers;
-    for(auto e = line.begin() + 3; e != line.end(); ++e){
-        if (stoi(*e) == 1){
+    for(auto column = line.begin() + 3; column != line.end(); ++column){
+        if (stoi(*column) == 1){
             ++numberOfBorrowers;
         }
     }
@@ -79,19 +79,17 @@ int getNumberOfBorrowers(std::vector<std::string> line) {
 void Problem::readCosts(std::string filename){
     std::vector<std::vector<std::string > > lines = readFile(filename);
 
-    // createColumnMapAndpeople?(lines[0]);
     // readHeaderAndCreateColumnMap(lines[0])
     std::map<int, std::string> mapColumnToName;
-    std::vector<std::string> line = lines[0];
-    for(int column = 0; column < line.size(); ++column){
-        if(column > 2){
-            std::string name = line[column];
-            mapColumnToName.emplace(column, name);
-            people.emplace_back(name, "", 0.0);
-        }
+    std::vector<std::string> headerLine = lines[0];
+    for(int column = 3; column < headerLine.size(); ++column){
+        std::string name = headerLine[column];
+        mapColumnToName.emplace(column, name);
+        people.emplace_back(name);
     }
 
     // readBody();
+    // Skip first line because of header
     for(auto line = lines.begin() + 1; line < lines.end(); ++line){
         std::string name;
         int amount;

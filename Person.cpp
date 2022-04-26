@@ -4,12 +4,8 @@
 
 // constructor
 Person::Person(){}
-Person::Person(std::string _name, std::string _number, double _payed) {
+Person::Person(std::string _name) {
     name = _name;
-    number = _number;
-    payed = _payed;
+    number = "";
+    payed = 0.0;
 }
-
-void Person::myFunction() {
-    std::cout << "shiter" << "\n";
-};
