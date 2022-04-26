@@ -1,5 +1,6 @@
 #include "Problem.h"
 #include "Person.h"
+#include "readcsv.h"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -14,46 +15,6 @@ Problem::Transaction::Transaction(Person _giver, Person _reciever, double _amoun
   giver = _giver;
   reciever = _reciever;
   amount = _amount;
-}
-
-void removeWhiteSpace(std::string& s){
-    s.erase(std::remove_if(s.begin(), s.end(), isspace), s.end());
-}
-
-std::vector<std::string> readLine(std::string csvLine){
-
-    removeWhiteSpace(csvLine);
-    std::istringstream csvStream(csvLine);
-    std::string csvElement;
-    std::vector<std::string> line;
-    while(std::getline(csvStream, csvElement, ',') ) {
-        line.emplace_back(csvElement);
-    }
-    return line;
-}
-
-std::vector<std::vector<std::string > > readLines(std::ifstream& csvFile){
-    std::vector<std::vector<std::string > > lines;
-    std::string csvLine;
-    while (std::getline(csvFile, csvLine)){
-        std::vector<std::string> line = readLine(csvLine);
-        lines.emplace_back(line);
-    }
-    return lines;
-}
-
-std::vector<std::vector<std::string > > readFile(const std::string fileName){
-    std::cout << "Reading " << fileName << std::endl;
-    std::ifstream csvFile(fileName);
-    std::vector<std::vector<std::string > > lines;
-    if (csvFile.is_open()){
-        lines = readLines(csvFile);
-    }
-    else{
-        std::cout << "no file found" << std::endl;
-    }
-    csvFile.close();
-    return lines;
 }
 
 void Problem::readNumbers(std::string filename){
