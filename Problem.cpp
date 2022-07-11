@@ -7,7 +7,6 @@
 #include <sstream>
 #include <algorithm>
 #include <numeric>
-#include <map>
 
 Problem::Problem() { }
 
@@ -40,12 +39,10 @@ int getNumberOfBorrowers(std::vector<std::string> line) {
 void Problem::readCosts(std::string filename){
     std::vector<std::vector<std::string > > lines = readFile(filename);
 
-    // readHeaderAndCreateColumnMap(lines[0])
-    std::map<int, std::string> mapColumnToName;
+    // Create a list of people
     std::vector<std::string> headerLine = lines[0];
     for(int column = 3; column < headerLine.size(); ++column){
         std::string name = headerLine[column];
-        mapColumnToName.emplace(column, name);
         people.emplace_back(name);
     }
 
@@ -66,13 +63,9 @@ void Problem::readCosts(std::string filename){
                 amount = std::stod(*element);
                 payer->payed += amount;
             } else if (column > 2 && stoi(*element) == 1){
-                /* std::string columnName = headerLine[column]; */
-                std::string columnName = mapColumnToName[column];
+                std::string columnName = headerLine[column];
                 borrower = findPerson(columnName);
                 borrower->borrowed += amount / numberOfBorrowers;
-                /* if (payer != borrower){ */
-                /*     borrower->borrowed += amount / numberOfBorrowers; */
-                /* } */
             }
             ++column;
         }
@@ -120,55 +113,6 @@ void Problem::solve() {
         }
     }
 };
-/* void Problem::solve() { */
-/*     std::cout << "Solving problem ..." << std::endl; */
-
-/*     std::vector<Person> people_with_negative_balance; */
-/*     std::vector<Person> people_with_positive_balance; */
-
-/*     for(auto p: people){ */
-/*       double balance = p.payed - p.borrowed; */
-/*       if(balance < 0){ */
-/*         people_with_negative_balance.push_back(p); */
-/*       }else{ */
-/*         people_with_positive_balance.push_back(p); */
-/*       } */
-/*     } */
-/*     std::sort(people_with_negative_balance.begin(), */
-/*               people_with_negative_balance.end(), */
-/*               [](Person a, Person b) { return a.payed-a.borrowed < b.payed-b.borrowed; }); */
-/*     std::sort(people_with_positive_balance.begin(), */
-/*               people_with_positive_balance.end(), */
-/*               [](Person a, Person b) { return a.payed-a.borrowed < b.payed-b.borrowed; }); */
-/*     auto giver = people_with_positive_balance.begin(); */
-/*     auto reciever = people_with_negative_balance.begin(); */
-/*     double give = 0; */
-/*     double recieve = 0; */
-
-/*     while (!people_with_positive_balance.empty()){ */
-
-/*         std::cout << "shit" << std::endl; */
-/*         double giver_balance = giver->payed - giver->borrowed; */
-/*         double reciever_balance = reciever->payed - reciever->borrowed; */
-/*         const double maximum_give = giver_balance - give; */
-/*         const double maximum_recieve = reciever_balance + recieve; */
-/*         std::cout << maximum_give << std::endl; */
-/*         std::cout << maximum_recieve << std::endl; */
-/*         const double amount = std::min(maximum_give, maximum_recieve); */
-
-/*         transactions.emplace_back(*giver, *reciever, amount); */
-/*         give += amount; */
-/*         recieve -= amount; */
-
-/*         if(maximum_give < maximum_recieve){ */
-/*           ++giver; */
-/*           give = 0; */
-/*         } else { */
-/*           --reciever; */
-/*           recieve = 0; */
-/*         } */
-/*     } */
-/* }; */
 
 
 // TDDO
@@ -180,12 +124,12 @@ void Problem::solve() {
 void Problem::printPayedAndBorrowed(const Person person) const {
     std::cout << person.name << std::endl;
     std::cout << "    "
-              << -person.payed
-              << " payed"
-              << std::endl;
-    std::cout << "    "
               << person.borrowed
               << " borrowed "
+              << std::endl;
+    std::cout << "    "
+              << -person.payed
+              << " payed"
               << std::endl;
 }
 
