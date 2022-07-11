@@ -1,3 +1,4 @@
-lender, amount, description,olof,olle
-  olof,    500,      SHITER,   1,   0
-  olle,    500,      SHITER,   0,   1
+lender, amount, description,olof,olle,sven
+  olof,    101.51,      SHITER,   1,   1,   1
+  olle,    500,      SHITER,   1,   1,   1
+  sven,    300,      SHITER,   1,   1,   1

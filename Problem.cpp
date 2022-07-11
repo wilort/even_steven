@@ -28,7 +28,7 @@ void Problem::readNumbers(std::string filename){
 }
 
 int getNumberOfBorrowers(std::vector<std::string> line) {
-    int numberOfBorrowers;
+    int numberOfBorrowers = 0;
     for(auto column = line.begin() + 3; column != line.end(); ++column){
         if (stoi(*column) == 1){
             ++numberOfBorrowers;
@@ -53,7 +53,7 @@ void Problem::readCosts(std::string filename){
     // Skip first line because of header
     for(auto line = lines.begin() + 1; line < lines.end(); ++line){
         std::string name;
-        int amount;
+        double amount;
         int column = 0;
         std::vector<Person>::iterator payer;
         std::vector<Person>::iterator borrower;
@@ -63,14 +63,16 @@ void Problem::readCosts(std::string filename){
                 name = *element;
                 payer = findPerson(name);
             } else if (column == 1){
-                amount = std::stoi(*element);
+                amount = std::stod(*element);
                 payer->payed += amount;
             } else if (column > 2 && stoi(*element) == 1){
+                /* std::string columnName = headerLine[column]; */
                 std::string columnName = mapColumnToName[column];
                 borrower = findPerson(columnName);
-                if (payer != borrower){
-                    borrower->borrowed += amount / numberOfBorrowers;
-                }
+                borrower->borrowed += amount / numberOfBorrowers;
+                /* if (payer != borrower){ */
+                /*     borrower->borrowed += amount / numberOfBorrowers; */
+                /* } */
             }
             ++column;
         }
@@ -91,19 +93,23 @@ void Problem::solve() {
     std::sort(people.begin(),
               people.end(),
               [](Person a, Person b) { return a.payed-a.borrowed < b.payed-b.borrowed; });
+    
     auto giver = people.begin();
     auto reciever = people.end() - 1;
     double give = 0;
     double recieve = 0;
-
     while (giver < reciever){
         const double maximum_give = giver->borrowed - giver->payed - give;
         const double maximum_recieve = reciever->payed - reciever->borrowed + recieve;
+        std::cout << giver->name << " can give " << maximum_give << std::endl;
+        std::cout << reciever->name << " can reciever " << maximum_recieve << std::endl;
         const double amount = std::min(maximum_give, maximum_recieve);
 
-        transactions.emplace_back(*giver, *reciever, amount);
-        give += amount;
-        recieve -= amount;
+        if(amount > 0){
+          transactions.emplace_back(*giver, *reciever, amount);
+          give += amount;
+          recieve -= amount;
+        }
 
         if(maximum_give < maximum_recieve){
           ++giver;
@@ -114,6 +120,55 @@ void Problem::solve() {
         }
     }
 };
+/* void Problem::solve() { */
+/*     std::cout << "Solving problem ..." << std::endl; */
+
+/*     std::vector<Person> people_with_negative_balance; */
+/*     std::vector<Person> people_with_positive_balance; */
+
+/*     for(auto p: people){ */
+/*       double balance = p.payed - p.borrowed; */
+/*       if(balance < 0){ */
+/*         people_with_negative_balance.push_back(p); */
+/*       }else{ */
+/*         people_with_positive_balance.push_back(p); */
+/*       } */
+/*     } */
+/*     std::sort(people_with_negative_balance.begin(), */
+/*               people_with_negative_balance.end(), */
+/*               [](Person a, Person b) { return a.payed-a.borrowed < b.payed-b.borrowed; }); */
+/*     std::sort(people_with_positive_balance.begin(), */
+/*               people_with_positive_balance.end(), */
+/*               [](Person a, Person b) { return a.payed-a.borrowed < b.payed-b.borrowed; }); */
+/*     auto giver = people_with_positive_balance.begin(); */
+/*     auto reciever = people_with_negative_balance.begin(); */
+/*     double give = 0; */
+/*     double recieve = 0; */
+
+/*     while (!people_with_positive_balance.empty()){ */
+
+/*         std::cout << "shit" << std::endl; */
+/*         double giver_balance = giver->payed - giver->borrowed; */
+/*         double reciever_balance = reciever->payed - reciever->borrowed; */
+/*         const double maximum_give = giver_balance - give; */
+/*         const double maximum_recieve = reciever_balance + recieve; */
+/*         std::cout << maximum_give << std::endl; */
+/*         std::cout << maximum_recieve << std::endl; */
+/*         const double amount = std::min(maximum_give, maximum_recieve); */
+
+/*         transactions.emplace_back(*giver, *reciever, amount); */
+/*         give += amount; */
+/*         recieve -= amount; */
+
+/*         if(maximum_give < maximum_recieve){ */
+/*           ++giver; */
+/*           give = 0; */
+/*         } else { */
+/*           --reciever; */
+/*           recieve = 0; */
+/*         } */
+/*     } */
+/* }; */
 
 
 // TDDO
@@ -157,7 +212,8 @@ void Problem::printTransactions(const Person person) const {
             sum += transaction.amount;
         }
     }
-    std::cout << "    " << -person.payed + sum << " outgoing balance\n" << std::endl;
+    double outgoing_balance = -person.payed + sum;
+    std::cout << "    " << outgoing_balance << " outgoing balance\n" << std::endl;
 }
 
 void Problem::printSummary() const {
