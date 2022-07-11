@@ -26,15 +26,14 @@ void Problem::readNumbers(std::string filename){
     }
 }
 
-int getNumberOfBorrowers(std::vector<std::string> line) {
-    int numberOfBorrowers = 0;
+int getTotalParts(std::vector<std::string> line) {
+    int totalParts = 0;
     for(auto column = line.begin() + 3; column != line.end(); ++column){
-        if (stoi(*column) == 1){
-            ++numberOfBorrowers;
-        }
+        totalParts += stoi(*column);
     }
-    return numberOfBorrowers;
+    return totalParts;
 }
+
 
 void Problem::readCosts(std::string filename){
     std::vector<std::vector<std::string > > lines = readFile(filename);
@@ -54,7 +53,7 @@ void Problem::readCosts(std::string filename){
         int column = 0;
         std::vector<Person>::iterator payer;
         std::vector<Person>::iterator borrower;
-        int numberOfBorrowers = getNumberOfBorrowers(*line);
+        const int totalParts = getTotalParts(*line);
         for(auto element = line->begin(); element < line->end(); ++element){
             if (column == 0){
                 name = *element;
@@ -62,10 +61,12 @@ void Problem::readCosts(std::string filename){
             } else if (column == 1){
                 amount = std::stod(*element);
                 payer->balance += amount;
-            } else if (column > 2 && stoi(*element) == 1){
+            } else if (column >= 3){
+                double part = stod(*element);
+                double fraction = part / totalParts;
                 std::string columnName = headerLine[column];
                 borrower = getPersonByName(columnName);
-                borrower->desired_balance += amount / numberOfBorrowers;
+                borrower->desired_balance += amount * fraction;
             }
             ++column;
         }
@@ -93,10 +94,8 @@ void Problem::solve() {
     double give = 0;
     double recieve = 0;
     while (giver < reciever){
-        const double maximum_give = giver->balance - giver->desired_balance + give;
-        const double maximum_recieve = reciever->desired_balance - reciever->balance - recieve;
-        std::cout << giver->name << " can give " << maximum_give << std::endl;
-        std::cout << reciever->name << " can reciever " << maximum_recieve << std::endl;
+        const double maximum_give = giver->balance - giver->desired_balance - give;
+        const double maximum_recieve = reciever->desired_balance - reciever->balance + recieve;
         const double amount = std::min(maximum_give, maximum_recieve);
 
         if(amount > 0){
