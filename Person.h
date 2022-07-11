@@ -7,8 +7,10 @@ private:
 public:
     std::string name;
     std::string number;
-    double payed;
-    double borrowed;
+    // balance represents the negative sum of payments that this person did during a trip
+    // desired_balance is the negative sum of payments that this person should have after everyone is even steven
+    double balance;
+    double desired_balance;
 
     Person();
     Person(std::string a);
