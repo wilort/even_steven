@@ -21,7 +21,7 @@ public:
     std::map<int, std::string> mapColumnToName;
 
     Problem();
-    std::vector<Person>::iterator findPerson(const std::string fileName);
+    std::vector<Person>::iterator getPersonByName(const std::string fileName);
     void readCosts(const std::string fileName);
     void readCsv(std::ifstream& csvFile);
     void readLine(const std::string fileName);

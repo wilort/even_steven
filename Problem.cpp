@@ -7,7 +7,6 @@
 #include <sstream>
 #include <algorithm>
 #include <numeric>
-#include <map>
 
 Problem::Problem() { }
 
@@ -22,13 +21,13 @@ void Problem::readNumbers(std::string filename){
     for(std::vector<std::string> line : lines){
       std::string name = line[0];
       std::string number = line[1];
-      auto person = findPerson(name);
+      auto person = getPersonByName(name);
       person->number = number;
     }
 }
 
 int getNumberOfBorrowers(std::vector<std::string> line) {
-    int numberOfBorrowers;
+    int numberOfBorrowers = 0;
     for(auto column = line.begin() + 3; column != line.end(); ++column){
         if (stoi(*column) == 1){
             ++numberOfBorrowers;
@@ -40,12 +39,10 @@ int getNumberOfBorrowers(std::vector<std::string> line) {
 void Problem::readCosts(std::string filename){
     std::vector<std::vector<std::string > > lines = readFile(filename);
 
-    // readHeaderAndCreateColumnMap(lines[0])
-    std::map<int, std::string> mapColumnToName;
+    // Create a list of people
     std::vector<std::string> headerLine = lines[0];
     for(int column = 3; column < headerLine.size(); ++column){
         std::string name = headerLine[column];
-        mapColumnToName.emplace(column, name);
         people.emplace_back(name);
     }
 
@@ -53,7 +50,7 @@ void Problem::readCosts(std::string filename){
     // Skip first line because of header
     for(auto line = lines.begin() + 1; line < lines.end(); ++line){
         std::string name;
-        int amount;
+        double amount;
         int column = 0;
         std::vector<Person>::iterator payer;
         std::vector<Person>::iterator borrower;
@@ -61,23 +58,21 @@ void Problem::readCosts(std::string filename){
         for(auto element = line->begin(); element < line->end(); ++element){
             if (column == 0){
                 name = *element;
-                payer = findPerson(name);
+                payer = getPersonByName(name);
             } else if (column == 1){
-                amount = std::stoi(*element);
-                payer->payed += amount;
+                amount = std::stod(*element);
+                payer->balance += amount;
             } else if (column > 2 && stoi(*element) == 1){
-                std::string columnName = mapColumnToName[column];
-                borrower = findPerson(columnName);
-                if (payer != borrower){
-                    borrower->borrowed += amount / numberOfBorrowers;
-                }
+                std::string columnName = headerLine[column];
+                borrower = getPersonByName(columnName);
+                borrower->desired_balance += amount / numberOfBorrowers;
             }
             ++column;
         }
     }
 }
 
-std::vector<Person>::iterator Problem::findPerson(std::string name){
+std::vector<Person>::iterator Problem::getPersonByName(std::string name){
     std::vector<Person>::iterator person =
                           std::find_if(people.begin(),
                           people.end(),
@@ -88,27 +83,37 @@ std::vector<Person>::iterator Problem::findPerson(std::string name){
 void Problem::solve() {
     std::cout << "Solving problem ..." << std::endl;
 
+    // sort people by how much they owe other people in descending order
     std::sort(people.begin(),
               people.end(),
-              [](Person a, Person b) { return a.payed-a.borrowed < b.payed-b.borrowed; });
+              [](Person a, Person b) { return a.desired_balance-a.balance < b.desired_balance-b.balance; });
+
     auto giver = people.begin();
     auto reciever = people.end() - 1;
     double give = 0;
     double recieve = 0;
-
     while (giver < reciever){
-        const double maximum_give = giver->borrowed - giver->payed - give;
-        const double maximum_recieve = reciever->payed - reciever->borrowed + recieve;
+        const double maximum_give = giver->balance - giver->desired_balance + give;
+        const double maximum_recieve = reciever->desired_balance - reciever->balance - recieve;
+        std::cout << giver->name << " can give " << maximum_give << std::endl;
+        std::cout << reciever->name << " can reciever " << maximum_recieve << std::endl;
         const double amount = std::min(maximum_give, maximum_recieve);
 
-        transactions.emplace_back(*giver, *reciever, amount);
-        give += amount;
-        recieve -= amount;
+        if(amount > 0){
+          transactions.emplace_back(*giver, *reciever, amount);
+          give += amount;
+          recieve -= amount;
+        }
 
         if(maximum_give < maximum_recieve){
           ++giver;
           give = 0;
+        } else if ( maximum_give > maximum_recieve){
+          --reciever;
+          recieve = 0;
         } else {
+          ++giver;
+          give = 0;
           --reciever;
           recieve = 0;
         }
@@ -125,12 +130,13 @@ void Problem::solve() {
 void Problem::printPayedAndBorrowed(const Person person) const {
     std::cout << person.name << std::endl;
     std::cout << "    "
-              << -person.payed
-              << " payed"
+              << person.desired_balance
+              << " desired balance "
               << std::endl;
+    std::cout << "    --------------------" << std::endl;
     std::cout << "    "
-              << person.borrowed
-              << " borrowed "
+              << person.balance
+              << " balance"
               << std::endl;
 }
 
@@ -149,7 +155,7 @@ void Problem::printTransactions(const Person person) const {
             sum -= transaction.amount;
         }
         else if(person.name == transaction.reciever.name){
-            std::cout << "    "
+            std::cout << "    +"
                       << transaction.amount
                       << " from "
                       << transaction.giver.name
@@ -157,7 +163,8 @@ void Problem::printTransactions(const Person person) const {
             sum += transaction.amount;
         }
     }
-    std::cout << "    " << -person.payed + sum << " outgoing balance\n" << std::endl;
+    double final_balance = person.balance + sum;
+    std::cout << "    " << final_balance << " final balance\n" << std::endl;
 }
 
 void Problem::printSummary() const {

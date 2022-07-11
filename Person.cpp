@@ -7,5 +7,6 @@ Person::Person(){}
 Person::Person(std::string _name) {
     name = _name;
     number = "";
-    payed = 0.0;
+    balance = 0.0;
+    desired_balance = 0.0;
 }
