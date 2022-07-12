@@ -1,6 +1,5 @@
 #include "Person.h"
 #include <string>
-#include <iostream>
 
 // constructor
 Person::Person(){}

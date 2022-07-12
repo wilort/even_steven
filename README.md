@@ -1,6 +1,10 @@
 # even_steven
 
-TODO:
+Compile:
 
-Create a Problem class with function to solve the problem
-Create a function to read appropriate input
+make
+
+Usage:
+
+./main -c costs -n numbers
+./main -c costs_midsommar_2021

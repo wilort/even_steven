@@ -3,26 +3,23 @@
 #include "readcsv.h"
 #include <vector>
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
 #include <numeric>
 
 Problem::Problem() { }
 
 Problem::Transaction::Transaction(Person _giver, Person _reciever, double _amount) {
-  giver = _giver;
-  reciever = _reciever;
-  amount = _amount;
+    giver = _giver;
+    reciever = _reciever;
+    amount = _amount;
 }
 
 void Problem::readNumbers(std::string filename){
     std::vector<std::vector<std::string > > lines = readFile(filename);
     for(std::vector<std::string> line : lines){
-      std::string name = line[0];
-      std::string number = line[1];
-      auto person = getPersonByName(name);
-      person->number = number;
+        std::string name = line[0];
+        std::string number = line[1];
+        auto person = getPersonByName(name);
+        person->number = number;
     }
 }
 
@@ -33,7 +30,6 @@ int getTotalParts(std::vector<std::string> line) {
     }
     return totalParts;
 }
-
 
 void Problem::readCosts(std::string filename){
     std::vector<std::vector<std::string > > lines = readFile(filename);
@@ -99,34 +95,27 @@ void Problem::solve() {
         const double amount = std::min(maximum_give, maximum_recieve);
 
         if(amount > 0){
-          transactions.emplace_back(*giver, *reciever, amount);
-          give += amount;
-          recieve -= amount;
+            transactions.emplace_back(*giver, *reciever, amount);
+            give += amount;
+            recieve -= amount;
         }
 
         if(maximum_give < maximum_recieve){
-          ++giver;
-          give = 0;
+            ++giver;
+            give = 0;
         } else if ( maximum_give > maximum_recieve){
-          --reciever;
-          recieve = 0;
+            --reciever;
+            recieve = 0;
         } else {
-          ++giver;
-          give = 0;
-          --reciever;
-          recieve = 0;
+            ++giver;
+            give = 0;
+            --reciever;
+            recieve = 0;
         }
     }
 };
 
-
-// TDDO
-// 1. modify the program such that you can werite for example
-// "evensteven -c costs -n numbers"
-// 2. add flags for different things. help menu etc: main --help
-// 3. make it possible to weight the inputs unevenly
-// 4. create unit-tests
-void Problem::printPayedAndBorrowed(const Person person) const {
+void Problem::printPersonSummary(const Person person) const {
     std::cout << person.name << std::endl;
     std::cout << "    "
               << person.desired_balance
@@ -166,7 +155,7 @@ void Problem::printTransactions(const Person person) const {
     std::cout << "    " << final_balance << " final balance\n" << std::endl;
 }
 
-void Problem::printSummary() const {
+void Problem::printTransactionsSummary() const {
     std::cout << "number of transactions: " << transactions.size() << std::endl;
     double sum_of_transactions = std::accumulate(transactions.begin(),
                                                  transactions.end(),
@@ -178,8 +167,8 @@ void Problem::printSummary() const {
 void Problem::printSolution() const {
     std::cout << "Printing solution ...\n" << std::endl;
     for (Person person: people) {
-        printPayedAndBorrowed(person);
+        printPersonSummary(person);
         printTransactions(person);
     }
-    printSummary();
+    printTransactionsSummary();
 };
