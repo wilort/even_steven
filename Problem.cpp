@@ -46,21 +46,25 @@ void Problem::readCosts(std::string filename){
     for(auto line = lines.begin() + 1; line < lines.end(); ++line){
         std::string name;
         double amount;
+        std::string description = "";
         int column = 0;
         std::vector<Person>::iterator payer;
         std::vector<Person>::iterator borrower;
         const int totalParts = getTotalParts(*line);
         for(auto element = line->begin(); element < line->end(); ++element){
-            if (column == 0){
+            std::string columnName = headerLine[column];
+            if (columnName == "lender"){
                 name = *element;
                 payer = getPersonByName(name);
-            } else if (column == 1){
+            } else if (columnName == "amount"){
                 amount = std::stod(*element);
                 payer->balance += amount;
+            } else if (columnName == "description") {
+                description = *element;
+                payer->expenses.emplace_back(amount, description);
             } else if (column >= 3){
                 double part = stod(*element);
                 double fraction = part / totalParts;
-                std::string columnName = headerLine[column];
                 borrower = getPersonByName(columnName);
                 borrower->desired_balance += amount * fraction;
             }
@@ -122,10 +126,13 @@ void Problem::printPersonSummary(const Person person) const {
               << " desired balance "
               << std::endl;
     std::cout << "    --------------------" << std::endl;
-    std::cout << "    "
-              << person.balance
-              << " balance"
-              << std::endl;
+    for (Person::Expense expense: person.expenses) {
+        std::cout << "    "
+                  << expense.amount
+                  << " "
+                  << expense.description
+                  << std::endl;
+    }
 }
 
 void Problem::printTransactions(const Person person) const {
@@ -151,6 +158,7 @@ void Problem::printTransactions(const Person person) const {
             sum += transaction.amount;
         }
     }
+    std::cout << "    --------------------" << std::endl;
     double final_balance = person.balance + sum;
     std::cout << "    " << final_balance << " final balance\n" << std::endl;
 }
