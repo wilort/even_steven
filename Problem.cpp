@@ -121,11 +121,11 @@ void Problem::solve() {
 
 void Problem::printPersonSummary(const Person person) const {
     std::cout << person.name << std::endl;
-    std::cout << "    "
-              << person.desired_balance
-              << " desired balance "
-              << std::endl;
-    std::cout << "    --------------------" << std::endl;
+    /* std::cout << "    " */
+    /*           << person.desired_balance */
+    /*           << " desired balance " */
+    /*           << std::endl; */
+    /* std::cout << "    --------------------" << std::endl; */
     for (Person::Expense expense: person.expenses) {
         std::cout << "    "
                   << expense.amount
