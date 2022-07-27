@@ -18,8 +18,8 @@ public:
     // balance represents the negative sum of payments that this person did during a trip
     // desired_balance is the negative sum of payments that this person should have after everyone is even steven
     std::vector<Expense> expenses;
-    double balance;
-    double desired_balance;
+    double initialBalance;
+    double desiredBalance;
 
     Person();
     Person(std::string a);

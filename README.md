@@ -10,4 +10,4 @@ Usage:
 ./main -c costs_midsommar_2021
 
 
-issue with using dot to indicate decimal in the parts of the input
+use semicolon to seperate columns

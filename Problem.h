@@ -20,7 +20,7 @@ public:
     std::vector<Person>::iterator getPersonByName(const std::string fileName);
     void readCosts(const std::string fileName);
     void readNumbers(const std::string fileName);
-    void solve();
+    void createTransactions();
     void printPersonSummary(const Person person) const;
     void printTransactions(const Person person) const;
     void printSolution() const;

@@ -31,20 +31,27 @@ int getTotalParts(std::vector<std::string> line) {
     return totalParts;
 }
 
+bool isName(std::string str){
+    return !(str == "lender"
+          or str == "amount"
+          or str == "description");
+}
+
 void Problem::readCosts(std::string filename){
     std::vector<std::vector<std::string > > lines = readFile(filename);
 
     // Create a list of people
     std::vector<std::string> headerLine = lines[0];
-    for(int column = 3; column < headerLine.size(); ++column){
-        std::string name = headerLine[column];
-        people.emplace_back(name);
+    for(auto header: headerLine){
+        if(isName(header)){
+            std::string name = header;
+            people.emplace_back(name);
+        }
     }
 
     // readBody();
     // Skip first line because of header
     for(auto line = lines.begin() + 1; line < lines.end(); ++line){
-        std::string name;
         double amount;
         std::string description = "";
         int column = 0;
@@ -52,21 +59,21 @@ void Problem::readCosts(std::string filename){
         std::vector<Person>::iterator borrower;
         const int totalParts = getTotalParts(*line);
         for(auto element = line->begin(); element < line->end(); ++element){
-            std::string columnName = headerLine[column];
-            if (columnName == "lender"){
-                name = *element;
+            std::string columnHeader = headerLine[column];
+            if (columnHeader == "lender"){
+                std::string name = *element;
                 payer = getPersonByName(name);
-            } else if (columnName == "amount"){
+            } else if (columnHeader == "amount"){
                 amount = std::stod(*element);
-                payer->balance += amount;
-            } else if (columnName == "description") {
+                payer->initialBalance += amount;
+            } else if (columnHeader == "description") {
                 description = *element;
                 payer->expenses.emplace_back(amount, description);
-            } else if (column >= 3){
+            } else {
                 double part = stod(*element);
                 double fraction = part / totalParts;
-                borrower = getPersonByName(columnName);
-                borrower->desired_balance += amount * fraction;
+                borrower = getPersonByName(columnHeader);
+                borrower->desiredBalance += amount * fraction;
             }
             ++column;
         }
@@ -81,40 +88,41 @@ std::vector<Person>::iterator Problem::getPersonByName(std::string name){
     return person;
 }
 
-void Problem::solve() {
-    std::cout << "Solving problem ..." << std::endl;
+void Problem::createTransactions() {
+    std::cout << "Creating transactions ..." << std::endl;
 
     // sort people by how much they owe other people in descending order
+    // person who owes the most comes first
     std::sort(people.begin(),
               people.end(),
-              [](Person a, Person b) { return a.desired_balance-a.balance < b.desired_balance-b.balance; });
+              [](Person a, Person b) { return a.desiredBalance-a.initialBalance
+                                            < b.desiredBalance-b.initialBalance; });
 
     auto giver = people.begin();
     auto reciever = people.end() - 1;
-    double give = 0;
-    double recieve = 0;
+    double giverBalance = giver->initialBalance;
+    double recieverBalance = reciever->initialBalance;
+    double amount;
     while (giver < reciever){
-        const double maximum_give = giver->balance - giver->desired_balance - give;
-        const double maximum_recieve = reciever->desired_balance - reciever->balance + recieve;
-        const double amount = std::min(maximum_give, maximum_recieve);
 
-        if(amount > 0){
-            transactions.emplace_back(*giver, *reciever, amount);
-            give += amount;
-            recieve -= amount;
+        double maximum_give = giverBalance - giver->desiredBalance;
+        double maximum_recieve = reciever->desiredBalance - recieverBalance;
+        std::cout << giver->name << " max give " << maximum_give << std::endl;
+        std::cout << reciever->name << " max recieve " << maximum_recieve << std::endl;
+        amount = std::min(maximum_give, maximum_recieve);
+
+        transactions.emplace_back(*giver, *reciever, amount);
+        giverBalance -= amount;
+        recieverBalance += amount;
+
+        if(giverBalance == giver->desiredBalance){
+            ++giver;
+            giverBalance = giver->initialBalance;
         }
 
-        if(maximum_give < maximum_recieve){
-            ++giver;
-            give = 0;
-        } else if ( maximum_give > maximum_recieve){
+        if(recieverBalance == reciever->desiredBalance){
             --reciever;
-            recieve = 0;
-        } else {
-            ++giver;
-            give = 0;
-            --reciever;
-            recieve = 0;
+            recieverBalance = reciever->initialBalance;
         }
     }
 };
@@ -122,7 +130,7 @@ void Problem::solve() {
 void Problem::printPersonSummary(const Person person) const {
     std::cout << person.name << std::endl;
     /* std::cout << "    " */
-    /*           << person.desired_balance */
+    /*           << person.desiredBalance */
     /*           << " desired balance " */
     /*           << std::endl; */
     /* std::cout << "    --------------------" << std::endl; */
@@ -159,17 +167,17 @@ void Problem::printTransactions(const Person person) const {
         }
     }
     std::cout << "    --------------------" << std::endl;
-    double final_balance = person.balance + sum;
-    std::cout << "    " << final_balance << " final balance\n" << std::endl;
+    double finalBalance = person.initialBalance + sum;
+    std::cout << "    " << finalBalance << " final balance\n" << std::endl;
 }
 
 void Problem::printTransactionsSummary() const {
     std::cout << "number of transactions: " << transactions.size() << std::endl;
-    double sum_of_transactions = std::accumulate(transactions.begin(),
-                                                 transactions.end(),
-                                                 0,
-                                                 [](double a, Transaction b) { return a + b.amount; });
-    std::cout << "sum of transactions: " << sum_of_transactions << std::endl;
+    double sumOfTransactions = std::accumulate(transactions.begin(),
+                                               transactions.end(),
+                                               0.0,
+                                               [](double a, Transaction b) { return a + b.amount; });
+    std::cout << "sum of transactions: " << sumOfTransactions << std::endl;
 }
 
 void Problem::printSolution() const {

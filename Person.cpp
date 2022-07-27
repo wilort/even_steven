@@ -6,6 +6,6 @@ Person::Person(){}
 Person::Person(std::string _name) {
     name = _name;
     number = "";
-    balance = 0.0;
-    desired_balance = 0.0;
+    initialBalance = 0.0;
+    desiredBalance = 0.0;
 }

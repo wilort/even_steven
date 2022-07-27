@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     Problem problem;
     problem.readCosts(costsFile);
     problem.readNumbers(numbersFile);
-    problem.solve();
+    problem.createTransactions();
     problem.printSolution();
     return 0;
 }
