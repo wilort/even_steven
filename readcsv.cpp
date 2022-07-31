@@ -25,7 +25,7 @@ std::vector<std::string> readLine(std::string csvLine){
     std::istringstream csvStream(csvLine);
     std::string csvElement;
     std::vector<std::string> line;
-    while(std::getline(csvStream, csvElement, ',') ) {
+    while(std::getline(csvStream, csvElement, ';') ) {
         trim(csvElement, " ");
         line.emplace_back(csvElement);
     }
