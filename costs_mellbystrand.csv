@@ -1,0 +1,8 @@
+lender; amount;                             description; william; joanna; kim; rasmus; tove; gustaf; nickie; per
+kim   ;   -616;     utgift1(alla förutom per o william);       0;      1;   1;      1;    1;      1;      1;   0
+kim   ;  -1608;     utgift2(alla)                      ;       1;      1;   1;      1;    1;      1;      1;   1
+joanna;   -338;     utgift1(alla)                      ;       1;      1;   1;      1;    1;      1;      1;   1
+joanna;   -131;     utgift2(alla förutom per o william);       0;      1;   1;      1;    1;      1;      1;   0
+joanna;   -547;     utgift3(alla förutom per o william);       0;      1;   1;      1;    1;      1;      1;   0
+gustaf;  -1667; mat o systembolag(alla förutom per o william); 0;      1;   1;      1;    1;      1;      1;   0
+gustaf;   -300; mat o systembolag(alla)                ;       1;      1;   1;      1;    1;      1;      1;   1

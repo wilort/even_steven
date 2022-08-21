@@ -107,8 +107,6 @@ void Problem::createTransactions() {
 
         double maximum_give = giverBalance - giver->desiredBalance;
         double maximum_recieve = reciever->desiredBalance - recieverBalance;
-        std::cout << giver->name << " max give " << maximum_give << std::endl;
-        std::cout << reciever->name << " max recieve " << maximum_recieve << std::endl;
         amount = std::min(maximum_give, maximum_recieve);
 
         transactions.emplace_back(*giver, *reciever, amount);
